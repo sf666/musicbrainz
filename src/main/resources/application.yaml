@@ -1,0 +1,12 @@
+mb:
+  host: https://musicbrainz.org/ws/2/
+logging:
+  level:
+    #    ROOT: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    com.coles: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: trace
+  file:
+    name: mbservice.log
