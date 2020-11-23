@@ -4,11 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -126,9 +129,13 @@ public class MusicBranizService
     public void setRating(String trackID, int ratingInStars)
     {
         int ratingVal = ratingInStars * 20;
-        
+        String body = String.format("<metadata xmlns=\"http://musicbrainz.org/ns/mmd-2.0#\">\n" + "    <recording-list>\n" + "        <recording id=\"%s\">\n"
+                + "            <user-rating>%d</user-rating>\n" + "        </recording>\n" + "    </recording-list>\n" + "</metadata>\n" + "", trackID, ratingVal);
+
+        // WebClient client3 = WebClient.builder().baseUrl("http://localhost:8080").defaultCookie("cookieKey", "cookieValue")
+        // .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).defaultUriVariables(Collections.singletonMap("url", "http://localhost:8080")).build();
     }
-    
+
     /**
      * Send http request
      */
