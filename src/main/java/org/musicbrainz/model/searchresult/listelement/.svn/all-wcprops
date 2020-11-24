@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement
+END
+CollectionSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/CollectionSearchResultsWs2.java
+END
+RecordingSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/RecordingSearchResultsWs2.java
+END
+ReleaseGroupSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/ReleaseGroupSearchResultsWs2.java
+END
+LabelSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/LabelSearchResultsWs2.java
+END
+ReleaseSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/ReleaseSearchResultsWs2.java
+END
+WorkSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/WorkSearchResultsWs2.java
+END
+ArtistSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/ArtistSearchResultsWs2.java
+END
+AnnotationSearchResultsWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/model/searchresult/listelement/AnnotationSearchResultsWs2.java
+END

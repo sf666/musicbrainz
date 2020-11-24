@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter
+END
+RecordingSearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/RecordingSearchFilterWs2.java
+END
+ReleaseGroupSearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/ReleaseGroupSearchFilterWs2.java
+END
+AnnotationSearchtFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/AnnotationSearchtFilterWs2.java
+END
+LabelSearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/LabelSearchFilterWs2.java
+END
+SearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/SearchFilterWs2.java
+END
+ReleaseSearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/ReleaseSearchFilterWs2.java
+END
+WorkSearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/WorkSearchFilterWs2.java
+END
+ArtistSearchFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter/searchfilter/ArtistSearchFilterWs2.java
+END

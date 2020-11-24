@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice
+END
+AuthorizationException.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/AuthorizationException.java
+END
+DefaultWebServiceWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/DefaultWebServiceWs2.java
+END
+ResourceNotFoundException.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/ResourceNotFoundException.java
+END
+RequestException.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/RequestException.java
+END
+ResponseException.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/ResponseException.java
+END
+WebServiceException.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/WebServiceException.java
+END
+WebService.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/WebService.java
+END
+package.html
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/webservice/package.html
+END

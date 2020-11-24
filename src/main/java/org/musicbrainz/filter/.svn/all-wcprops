@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/14/musicbrainzws2-java/src/org/musicbrainz/filter
+END
+FilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/13/musicbrainzws2-java/src/org/musicbrainz/filter/FilterWs2.java
+END
+ReleaseTypeFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/!svn/ver/13/musicbrainzws2-java/src/org/musicbrainz/filter/ReleaseTypeFilterWs2.java
+END
+ReleaseStatusFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/13/musicbrainzws2-java/src/org/musicbrainz/filter/ReleaseStatusFilterWs2.java
+END
+DiscTocFilterWs2.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/13/musicbrainzws2-java/src/org/musicbrainz/filter/DiscTocFilterWs2.java
+END
