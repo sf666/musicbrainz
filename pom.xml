@@ -14,14 +14,14 @@
 	<artifactId>musicbrainz</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<name>musicbrainz</name>
-	<description>Music braninz microservice</description>
+	<description>Musicbrainz library</description>
 
 
 	<properties>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-		<java.version>11</java.version>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 
