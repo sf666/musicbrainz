@@ -38,7 +38,7 @@ public class MusicBrainzService
         Recording controller = new Recording();
         controller.getQueryWs().setUsername(config.username);
         controller.getQueryWs().setPassword(config.password);
-        controller.getQueryWs().setClient("nextcp/2");
+        controller.getQueryWs().setClient("nextcp2");
         controller.getIncludes().setUserRatings(true);
         controller.getIncludes().setUserTags(true);
 
@@ -53,7 +53,7 @@ public class MusicBrainzService
         }
     }
 
-    public int getRating(String recordingID)
+    public Integer getRating(String recordingID)
     {
         Recording controller = new Recording();
         controller.getQueryWs().setUsername(config.username);
@@ -66,12 +66,16 @@ public class MusicBrainzService
         {
             RecordingWs2 rec = controller.lookUp(recordingID);
             Float userRating = rec.getUserRating().getAverageRating();
-            return userRating.intValue();
+            if (userRating != null)
+            {
+                return userRating.intValue();
+            }
+            return null;
         }
         catch (MBWS2Exception e)
         {
-            log.warn("Error while setting star rating ... ", e);
-            return 0;
+            log.warn("Error while getting star rating ... ", e);
+            return null;
         }
     }
 }
