@@ -28,6 +28,7 @@ import org.musicbrainz.wsxml.element.Metadata;
 public abstract class Controller extends DomainsWs2{
     
     
+    private WebService readRating;
     private WebService queryWs;
     private WebService annotationWs;
     private int browseLimit = 100;
@@ -396,6 +397,17 @@ public abstract class Controller extends DomainsWs2{
         
         return adws;
     }
+    
+    /**
+     * @return the queryWs
+     */
+    public WebService getReadRatingWs() {
+        
+        if (readRating == null)
+            readRating = getDefaultQueryWs();
+        return readRating;
+    }
+
     /**
      * @return the queryWs
      */

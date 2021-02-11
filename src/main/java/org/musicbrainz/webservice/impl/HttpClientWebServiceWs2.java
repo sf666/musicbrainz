@@ -4,8 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLHandshakeException;
 
@@ -27,7 +31,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
@@ -46,6 +49,16 @@ import org.musicbrainz.webservice.WebServiceException;
 import org.musicbrainz.wsxml.MbXMLException;
 import org.musicbrainz.wsxml.element.Metadata;
 
+import okhttp3.Call;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 /**
  * A simple http client using Apache Commons HttpClient.
  * 
@@ -63,11 +76,17 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
     private DefaultHttpClient httpClient;
 
     /**
+     * 
+     */
+    private OkHttpClient okClient = null;
+
+    /**
      * Default constructor creates a httpClient with default properties.
      */
     public HttpClientWebServiceWs2()
     {
         this.httpClient = new DefaultHttpClient();
+        initOkClient();
     }
 
     /**
@@ -79,6 +98,47 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
     public HttpClientWebServiceWs2(DefaultHttpClient httpClient)
     {
         this.httpClient = httpClient;
+        initOkClient();
+    }
+
+    private void initOkClient()
+    {
+        okClient = new OkHttpClient.Builder().cookieJar(new CookieJar()
+        {
+            private List<Cookie> c = new ArrayList<>();
+
+            @Override
+            public void saveFromResponse(HttpUrl url, List<Cookie> cookies)
+            {
+                c = cookies;
+                for (Cookie cookie : cookies)
+                {
+                    System.out.println(cookie);
+                }
+            }
+
+            @Override
+            public List<Cookie> loadForRequest(HttpUrl url)
+            {
+                return c;
+            }
+        }).build();
+    }
+
+    @Override
+    public void login(String username, String password)
+    {
+        try
+        {
+            RequestBody formBody = new FormBody.Builder().add("username", username).add("password", password).build();
+            Request loginReq = new Request.Builder().url("https://musicbrainz.org/login").post(formBody).build();
+            Call loginRespCall = okClient.newCall(loginReq);
+            loginRespCall.execute();
+        }
+        catch (IOException e)
+        {
+            log.warn("login failed to musicbrainz.org", e);
+        }
     }
 
     private void setConnectionParam()
@@ -86,8 +146,8 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
 
         HttpParams connectionParams = httpClient.getParams();
 
-        HttpConnectionParams.setConnectionTimeout(connectionParams, 60000);
-        HttpConnectionParams.setSoTimeout(connectionParams, 60000);
+        HttpConnectionParams.setConnectionTimeout(connectionParams, 10000);
+        HttpConnectionParams.setSoTimeout(connectionParams, 10000);
         connectionParams.setParameter("http.useragent", USERAGENT);
         connectionParams.setParameter("http.protocol.content-charset", "UTF-8");
 
@@ -101,6 +161,34 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
             httpClient.getCredentialsProvider().setCredentials(authScope, creds);
         }
 
+    }
+
+    /**
+     * @return HTML page content or NULL, if page is not available
+     * @throws WebServiceException
+     */
+    public String getUserRatingsPage(String user, int page) throws WebServiceException
+    {
+        String requestUrl = String.format("https://musicbrainz.org/user/%s/ratings/recording?page=%d", user, page);
+        Request request = new Request.Builder().url(requestUrl).get().build();
+        Call call = okClient.newCall(request);
+        try
+        {
+            Response response = call.execute();
+            if (response.request().url().toString().equals(requestUrl))
+            {
+                return response.body().string();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (IOException e)
+        {
+            log.warn("unable to retrieve rating data from musicbrainz.org", e);
+        }
+        return null;
     }
 
     private void setRetryHandler()
@@ -168,7 +256,6 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
             HttpGet method = new HttpGet(url);
             method.setHeader(HttpHeaders.ACCEPT, "application/xml");
             method.setHeader(HttpHeaders.CACHE_CONTROL, "max-age=0");
-            
 
             Metadata md = executeMethod(method);
             if (md == null && trial > maxtrial)

@@ -1,5 +1,6 @@
 package org.musicbrainz.webservice;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +67,13 @@ public interface WebService {
      public Metadata delete (String entity, String id, List<String> data)
             throws WebServiceException, MbXMLException;
     
+ 
+    
+    public String getUserRatingsPage(String user, int page) throws WebServiceException;
+     
     public void setUsername(String username);
     public void setPassword(String password);
     public void setClient(String client);
+
+    public void login(String username, String password);
 }

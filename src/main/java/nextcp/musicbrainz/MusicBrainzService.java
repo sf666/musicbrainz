@@ -1,6 +1,10 @@
 package nextcp.musicbrainz;
 
+import java.util.HashMap;
+import java.util.ResourceBundle.Control;
+
 import org.musicbrainz.MBWS2Exception;
+import org.musicbrainz.controller.RatingController;
 import org.musicbrainz.controller.Recording;
 import org.musicbrainz.model.entity.RecordingWs2;
 import org.slf4j.Logger;
@@ -53,6 +57,14 @@ public class MusicBrainzService
         }
     }
 
+    public HashMap<String, Integer> getAllUserRatings()
+    {
+        RatingController controller = new RatingController();
+        controller.getReadRatingWs().setClient("nextcp/2");
+        controller.login(config.username, config.password);
+        return controller.getAllUserRatings(config.username, config.password);
+    }
+    
     public Integer getRating(String recordingID)
     {
         Recording controller = new Recording();
