@@ -31,8 +31,9 @@ public class MusicBrainzService
      *            aka trackId
      * @param stars
      *            0 = delete rating, 1-5 stars allowed
+     * @throws MBWS2Exception 
      */
-    public void setRating(String recordingID, int stars)
+    public void setRating(String recordingID, int stars) throws MBWS2Exception
     {
         if (stars < 0 || stars > 5)
         {
@@ -46,15 +47,8 @@ public class MusicBrainzService
         controller.getIncludes().setUserRatings(true);
         controller.getIncludes().setUserTags(true);
 
-        try
-        {
-            controller.lookUp(recordingID);
-            controller.rate(stars);
-        }
-        catch (MBWS2Exception e)
-        {
-            log.warn("Error while setting star rating ... ", e);
-        }
+        controller.lookUp(recordingID);
+        controller.rate(stars);
     }
 
     public HashMap<String, Integer> getAllUserRatings()
