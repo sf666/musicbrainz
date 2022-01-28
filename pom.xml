@@ -15,7 +15,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>musicbrainz</name>
 	<description>Musicbrainz library</description>
-	
+
 	<scm>
 		<connection>scm:git:https://github.com/sf666/musicbrainz.git</connection>
 	</scm>
@@ -27,6 +27,27 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
+
+	<distributionManagement>
+		<repository>
+			<id>internal.repo</id>
+			<name>Temporary Staging Repository</name>
+			<url>file://${project.build.directory}/mvn-artifact</url>
+		</repository>
+	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<altDeploymentRepository>
+						internal.repo::default::file://${project.build.directory}/mvn-artifact
+					</altDeploymentRepository>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 
