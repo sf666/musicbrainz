@@ -10,13 +10,13 @@
 
 	<groupId>de.sf666</groupId>
 	<artifactId>musicbrainz</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>musicbrainz</name>
 	<description>Musicbrainz library</description>
 
 	<scm>
 		<connection>scm:git:https://github.com/sf666/musicbrainz.git</connection>
-	  <tag>musicbrainz-1.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<properties>
