@@ -36,12 +36,37 @@ public class ReleaseGroupWs2 extends EntityWs2 {
     public static final String TYPE_OTHER = NS_MMD_2 + "other";
 
     private String type;
+    private String typeId;
     private String typeString;
     private String title;
     private String firstReleaseDateStr;
     private String disambiguation;
     private ArtistCreditWs2 artistCredit;
     private ReleaseListWs2 releaseList = new ReleaseListWs2();
+
+    private String primaryType;
+    
+    
+    
+    public String getPrimaryType()
+    {
+        return primaryType;
+    }
+
+    public void setPrimaryType(String primaryType)
+    {
+        this.primaryType = primaryType;
+    }
+
+    public String getTypeId()
+    {
+        return typeId;
+    }
+
+    public void setTypeId(String typeId)
+    {
+        this.typeId = typeId;
+    }
 
     /**
      * @return the typeString

@@ -56,7 +56,32 @@ public class ReleaseWs2 extends EntityWs2 {
     private LabelInfoListWs2 labelInfoList;
     private MediumListWs2 mediumList;
     
+    private String releaseEventList;
+    private String coverArtArchive;
+    
+    
+    
     // Recording is via Medium.
+
+    public String getReleaseEventList()
+    {
+        return releaseEventList;
+    }
+
+    public void setReleaseEventList(String releaseEventList)
+    {
+        this.releaseEventList = releaseEventList;
+    }
+
+    public String getCoverArtArchive()
+    {
+        return coverArtArchive;
+    }
+
+    public void setCoverArtArchive(String coverArtArchive)
+    {
+        this.coverArtArchive = coverArtArchive;
+    }
 
     public String getTitle() {
         return title;

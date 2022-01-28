@@ -25,7 +25,9 @@ public class RecordingWs2 extends EntityWs2
     private List<IsrcWs2> isrcs;
 
     private ReleaseListWs2 releaseList = new ReleaseListWs2();
-	
+
+    private String firstReleaseDate;
+    
     public RecordingWs2() {
 
     }
@@ -143,6 +145,17 @@ public class RecordingWs2 extends EntityWs2
         }
 
         return false;
+    }
+
+
+    public void setFirstReleaseDate(String firstReleaseDate)
+    {
+        this.firstReleaseDate = firstReleaseDate;
+    }
+
+    public String getFirstReleaseDate()
+    {
+        return firstReleaseDate;
     }
 	
 }

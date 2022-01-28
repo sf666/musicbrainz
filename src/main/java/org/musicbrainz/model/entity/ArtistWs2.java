@@ -23,8 +23,10 @@ public class ArtistWs2 extends EntityWs2 {
 	/**
 	 * The artist's type (as an absolute URI).
 	 */
-           private String type;
-    
+	private String type;
+
+	private String typeId;
+	
 	/**
 	 * The artist's name.
 	 */
@@ -59,7 +61,17 @@ public class ArtistWs2 extends EntityWs2 {
 
 	 */
 	private ReleaseListWs2 releaseList = new ReleaseListWs2();
-        	 
+    
+	
+	
+        public String getTypeId()
+    {
+        return typeId;
+    }
+    public void setTypeId(String typeId)
+    {
+        this.typeId = typeId;
+    }
         /* 
 	 * This One only  include releases where this artist isn't the
 	 * main artist but has just contributed one or more tracks

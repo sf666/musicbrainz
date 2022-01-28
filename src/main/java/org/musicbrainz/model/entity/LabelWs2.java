@@ -26,6 +26,7 @@ public class LabelWs2 extends EntityWs2 {
 	 */
            private String type;
     
+           private String typeId;
 	/**
 	 * The label's name.
 	 */
@@ -67,7 +68,17 @@ public class LabelWs2 extends EntityWs2 {
 	 */
 	private ReleaseListWs2 releaseList = new ReleaseListWs2();
 
-          /**
+	
+	
+    public String getTypeId()
+    {
+        return typeId;
+    }
+    public void setTypeId(String typeId)
+    {
+        this.typeId = typeId;
+    }
+        /**
 	 * @return the name
 	 */
            

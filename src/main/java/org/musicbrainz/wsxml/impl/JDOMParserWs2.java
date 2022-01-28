@@ -295,6 +295,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             if (attribute.getName().equals(ID)){
                 label.setIdUri(MbUtils.convertIdToURI(attribute.getValue(), LABEL));
             }
+            else if (attribute.getName().equals(TYPE_ID)){
+                label.setTypeId(attribute.getValue());
+            }
             else if (attribute.getName().equals(TYPE)){
                 label.setType(MbUtils.convertTypeToURI(attribute.getValue(), NS_MMD_2_PREFIX));
             }
@@ -377,6 +380,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             else if (attribute.getName().equals(TYPE)){
               artist.setType(MbUtils.convertTypeToURI(attribute.getValue(), NS_MMD_2_PREFIX));
             }
+            else if (attribute.getName().equals(TYPE_ID)){
+                artist.setTypeId(attribute.getValue());
+              }
             else if (attribute.getName().equals(SCORE)){
               //ignore.
             }  
@@ -475,6 +481,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
                   
                   releaseGroup.setTypeString(attribute.getValue());
               }
+              else if (attribute.getName().equals(TYPE_ID)){
+                  releaseGroup.setTypeId(attribute.getValue());
+              }
               else if (attribute.getName().equals(SCORE)) {
                   //ignore.
               }  
@@ -505,6 +514,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             }
             else if (USERRATING.equals(child.getName())) {
                 releaseGroup.setUserRating(createUserRating(child));
+            }
+            else if (PRIMARYTYPE.equals(child.getName())) {
+                releaseGroup.setPrimaryType(child.getText());
             }
             else if (RELEASELIST.equals(child.getName())) {
                 addReleasesToList(child, releaseGroup.getReleaseList());
@@ -601,6 +613,12 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             else if (ASIN.equals(child.getName())) {
                 release.setAsin(child.getText());
             }
+            else if (RELEASEEVENTLIST.equals(child.getName())) {
+                release.setReleaseEventList(child.getText());
+            }
+            else if (COVERARTARCHIVE.equals(child.getName())) {
+                release.setCoverArtArchive(child.getText());
+            }
             else if (RATING.equals(child.getName())) {
                 // not in MB at the moment.
                 release.setRating(createRating(child));
@@ -673,6 +691,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             }
             else if (DISAMBIGUATION.equals(child.getName())) {
                 recording.setDisambiguation(child.getText());
+            }
+            else if (FIRSTRELEASEDATE.equals(child.getName())) {
+                recording.setFirstReleaseDate(child.getText());
             }
             else if (ARTISTCREDIT.equals(child.getName())) {
                 recording.setArtistCredit(createArtistCredit(child));
@@ -788,8 +809,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
 
               if (attribute.getName().equals(TYPE)){
                   relation.setType(MbUtils.convertTypeToURI(attribute.getValue(), NS_REL_2_PREFIX));
-              }
-              else{
+              } else if (attribute.getName().equals(TYPE_ID)){
+                  relation.setType(MbUtils.convertTypeToURI(attribute.getValue(), NS_REL_2_PREFIX));
+              } else{
                   log.warn("Unrecognised Relation attribute: "+attribute.getName());
               }
         }
@@ -1173,7 +1195,11 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
         Iterator itr = node.getAttributes().iterator();
         while (itr.hasNext()) {
               Attribute attribute = (Attribute)itr.next();
-              log.warn("Unrecognised Track attribute: "+attribute.getName());
+              if (TRACK_ID.equals(attribute.getName())) {
+                  t.setId(attribute.getValue());
+              } else {
+                  log.warn("Unrecognised Track attribute: "+attribute.getName());
+              }
         }
 
         itr = node.getChildren().iterator();
@@ -1189,6 +1215,9 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             }
             else if (RECORDING.equals(child.getName())) {
                 t.setRecording(createRecording(child));
+            }
+            else if (NUMBER.equals(child.getName())) {
+                t.setNumber(child.getText());
             }
             else if (LENGTH.equals(child.getName())) 
             {

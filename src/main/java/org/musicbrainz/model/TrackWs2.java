@@ -19,7 +19,8 @@ public class TrackWs2
     private String title;
     private RecordingWs2 recording;
     private Long durationInMillis;
-           
+    private String id;
+    private String number;
     
     /**
    * Default Constructor
@@ -28,6 +29,31 @@ public class TrackWs2
     {
 
     }
+
+    
+    public String getId()
+    {
+        return id;
+    }
+
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+
+    public String getNumber()
+    {
+        return number;
+    }
+
+
+    public void setNumber(String number)
+    {
+        this.number = number;
+    }
+
 
     /**
      * @return the position

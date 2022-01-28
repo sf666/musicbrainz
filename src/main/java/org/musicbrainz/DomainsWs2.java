@@ -74,12 +74,15 @@ public abstract class DomainsWs2 {
     public static final String ISWC = "iswc";
     public static final String MEDIUM = "medium";
     public static final String TRACK = "track";
+    public static final String TRACK_ID = "id";
     public static final String TEXTREPRESENTATION = "text-representation";
     public static final String LIFESPAN = "life-span";
     public static final String TAG = "tag";
     public static final String RATING = "rating";
     public static final String USERRATING = "user-rating";
     public static final String USERTAG = "user-tag";
+    public static final String RELEASEEVENTLIST = "release-event-list";
+    public static final String COVERARTARCHIVE = "cover-art-archive";
     
     public static final String LABELLIST = "label-list";
     public static final String ARTISTLIST = "artist-list";
@@ -90,6 +93,7 @@ public abstract class DomainsWs2 {
     public static final String ANNOTATIONLIST = "annotation-list";
     public static final String COLLECTIONLIST = "collection-list";
     public static final String RELATIONLIST = "relation-list";
+    public static final String PRIMARYTYPE = "primary-type";    
     
     public static final String ALIASLIST = "alias-list";
     public static final String LABELINFOLIST = "label-info-list";
@@ -107,6 +111,7 @@ public abstract class DomainsWs2 {
     public static final String SORTNAME = "sort-name";
     public static final String TITLE = "title";
     public static final String TYPE = "type";
+    public static final String TYPE_ID = "type-id";
     public static final String DISAMBIGUATION = "disambiguation";
     
     public static final String ASIN = "asin";
@@ -127,6 +132,8 @@ public abstract class DomainsWs2 {
     public static final String STATUS = "status";
     public static final String SECTORS = "sectors";
     public static final String TRACKCOUNT = "track-count";
+    public static final String NUMBER = "number";
+    
     
     public static final String TARGET = "target";
     public static final String DIRECTION = "direction";
