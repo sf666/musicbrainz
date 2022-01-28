@@ -1,12 +1,14 @@
 package nextcp.musicbrainz;
 
 import java.util.HashMap;
-import java.util.ResourceBundle.Control;
 
+import org.apache.commons.lang3.StringUtils;
 import org.musicbrainz.MBWS2Exception;
 import org.musicbrainz.controller.RatingController;
 import org.musicbrainz.controller.Recording;
+import org.musicbrainz.controller.Release;
 import org.musicbrainz.model.entity.RecordingWs2;
+import org.musicbrainz.model.entity.ReleaseWs2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +27,45 @@ public class MusicBrainzService
         this.config = config;
     }
 
+    public AlbumDto getReleaseInfo(String releaseId)
+    {
+        if (StringUtils.isAllBlank(releaseId))
+        {
+            throw new RuntimeException("releaseID shall not be empty");
+        }
+
+        AlbumDto dto = new AlbumDto();
+
+        Release controller = new Release();
+        controller.getReadRatingWs().setClient("nextcp/2");
+        // controller.getIncludes().setReleaseRelations(true);
+        controller.getIncludes().setMedia(true);
+        try
+        {
+            ReleaseWs2 result = controller.lookUp(releaseId);
+
+            dto.albumArtist = result.getArtistCreditString();
+            dto.albumTitle = result.getTitle();
+            dto.albumYear = result.getDateStr();
+            dto.albumArtUrl = "";
+        }
+        catch (MBWS2Exception e)
+        {
+            throw new RuntimeException("Musicbrainz lookup failed ...", e);
+        }
+
+        return dto;
+    }
+
     /**
      * 
-     * @param recordingID
-     *            aka trackId
+     * @param trackId
+     * 
      * @param stars
      *            0 = delete rating, 1-5 stars allowed
-     * @throws MBWS2Exception 
+     * @throws MBWS2Exception
      */
-    public void setRating(String recordingID, int stars) throws MBWS2Exception
+    public void setRating(String trackId, int stars) throws MBWS2Exception
     {
         if (stars < 0 || stars > 5)
         {
@@ -47,7 +79,7 @@ public class MusicBrainzService
         controller.getIncludes().setUserRatings(true);
         controller.getIncludes().setUserTags(true);
 
-        controller.lookUp(recordingID);
+        controller.lookUp(trackId);
         controller.rate(stars);
     }
 
@@ -58,7 +90,7 @@ public class MusicBrainzService
         controller.login(config.username, config.password);
         return controller.getAllUserRatings(config.username, config.password);
     }
-    
+
     public Integer getRating(String recordingID)
     {
         Recording controller = new Recording();
