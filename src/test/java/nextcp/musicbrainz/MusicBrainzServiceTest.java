@@ -1,5 +1,7 @@
 package nextcp.musicbrainz;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +32,9 @@ public class MusicBrainzServiceTest
     public void testMusicBrainzRelease()
     {
         AlbumDto dto = service.getReleaseInfo("1e0eee38-a9f6-49bf-84d0-45d0647799af");
-        System.out.println(dto);
+        assertEquals("Ava Max", dto.albumArtist);
+        assertEquals("Not Your Barbie Girl", dto.albumTitle);
+        assertEquals("2018-08-13", dto.albumYear);
     }
     
     @Bean

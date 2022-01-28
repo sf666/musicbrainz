@@ -19,12 +19,11 @@ public class MusicBrainzService
 {
     private static final Logger log = LoggerFactory.getLogger(MusicBrainzService.class.getName());
 
+    @Autowired
     private MusicBrainzConfig config = null;
 
-    @Autowired
-    public MusicBrainzService(MusicBrainzConfig config)
+    public MusicBrainzService()
     {
-        this.config = config;
     }
 
     public AlbumDto getReleaseInfo(String releaseId)
@@ -47,7 +46,6 @@ public class MusicBrainzService
             dto.albumArtist = result.getArtistCreditString();
             dto.albumTitle = result.getTitle();
             dto.albumYear = result.getDateStr();
-            dto.albumArtUrl = "";
         }
         catch (MBWS2Exception e)
         {
