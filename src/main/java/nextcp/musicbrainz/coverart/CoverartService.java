@@ -43,6 +43,12 @@ public class CoverartService
             Request request = new Request.Builder().url(url).get().build();
             Call call = okClient.newCall(request);
             Response response = call.execute();
+            if (response.code() == 404)
+            {
+                log.info("no coverart found four relaseId : " + releaseId);
+                return "";
+            }
+            
             String body = response.body().string();
             CoverArtImages images = om.readValue(body, CoverArtImages.class);
             if (images != null && images.getImages() != null && images.getImages().get(0) != null)

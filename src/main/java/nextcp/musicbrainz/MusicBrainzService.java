@@ -26,6 +26,17 @@ public class MusicBrainzService
     {
     }
 
+    public MusicBrainzService(MusicBrainzConfig config)
+    {
+        super();
+        this.config = config;
+    }
+
+    public void setConfig(MusicBrainzConfig config)
+    {
+        this.config = config;
+    }
+
     public AlbumDto getReleaseInfo(String releaseId)
     {
         if (StringUtils.isAllBlank(releaseId))
@@ -42,7 +53,8 @@ public class MusicBrainzService
         try
         {
             ReleaseWs2 result = controller.lookUp(releaseId);
-
+            
+            dto.releaseId = releaseId;
             dto.albumArtist = result.getArtistCreditString();
             dto.albumTitle = result.getTitle();
             dto.albumYear = result.getDateStr();

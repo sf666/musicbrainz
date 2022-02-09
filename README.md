@@ -1,4 +1,4 @@
-# Music Brnaiz Microservice
+# Music Brainz Library
 
 ## Environment
 
@@ -7,15 +7,13 @@
 
 ## Configuration
 
-All the configurations were put in the application.yml file. All the fields were setup based on the Spring boot configuration. If required, please change the log file path to somewhere else.
+All the configurations were put in the application.yml file. Setup is based on the Spring boot configuration. 
 
 ## How to build
 
 * mvn clean
 * mvn package
 
-The artifact was under target folder.
+## How to use
 
-## How to run the project
-
-* java -jar target/musicbrainz-0.0.1-SNAPSHOT.jar
+Look at test cases how to use. 

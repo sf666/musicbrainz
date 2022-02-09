@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.musicbrainz.webservice.WebService;
 import org.musicbrainz.webservice.WebServiceException;
-import org.musicbrainz.webservice.impl.HttpClientWebServiceWs2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RatingController extends Controller
 {
     /**
      * A logger
      */
-    private Log log = LogFactory.getLog(HttpClientWebServiceWs2.class);
+    private static final Logger log = LoggerFactory.getLogger(RatingController.class.getName());
+    
     private WebService ws = getReadRatingWs();
     private Pattern ratingTokenizer = Pattern.compile("<li>.*?current-rating.*?>(?<star>.).*?\"\\/recording\\/(?<uuid>.*?)\".*?</li>", Pattern.DOTALL);
 

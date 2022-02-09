@@ -15,6 +15,9 @@ import nextcp.musicbrainz.coverart.CoverartService;
 @ContextConfiguration(classes = SpringTestConfiguration.class)
 @ComponentScan(
 { "nextcp" })
+/**
+ * How to use coverart service.
+ */
 public class CoverartServiceTest
 {
     @Lazy

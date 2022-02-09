@@ -7,23 +7,22 @@ package org.musicbrainz.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.musicbrainz.includes.ReleaseIncludesWs2;
-import org.musicbrainz.model.entity.DiscWs2;
-import org.musicbrainz.query.lookUp.LookUpWs2;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.musicbrainz.MBWS2Exception;
 import org.musicbrainz.discid.DiscIdException;
 import org.musicbrainz.discid.DiscInfo;
 import org.musicbrainz.discid.DiscInfo.TrackInfo;
 import org.musicbrainz.filter.DiscTocFilterWs2;
+import org.musicbrainz.includes.ReleaseIncludesWs2;
 import org.musicbrainz.model.DiscTrackWs2;
+import org.musicbrainz.model.entity.DiscWs2;
+import org.musicbrainz.query.lookUp.LookUpWs2;
 import org.musicbrainz.webservice.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Disc extends Controller{
 
-   private Log log = LogFactory.getLog(Disc.class);
-   
+   private static final Logger log = LoggerFactory.getLogger(Disc.class.getName());
    
    public Disc(){
     

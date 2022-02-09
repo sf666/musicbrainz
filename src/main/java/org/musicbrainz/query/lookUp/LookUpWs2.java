@@ -1,15 +1,7 @@
 package org.musicbrainz.query.lookUp;
 
-import org.apache.http.HttpStatus;
 import org.musicbrainz.MBWS2Exception;
 import org.musicbrainz.filter.DiscTocFilterWs2;
-import org.musicbrainz.webservice.RequestException;
-import org.musicbrainz.webservice.ResponseException;
-
-import org.musicbrainz.wsxml.element.Metadata;
-import org.musicbrainz.webservice.WebService;
-import org.musicbrainz.utils.MbUtils;
-
 import org.musicbrainz.includes.ArtistIncludesWs2;
 import org.musicbrainz.includes.CollectionIncludesWs2;
 import org.musicbrainz.includes.IncludesWs2;
@@ -18,10 +10,10 @@ import org.musicbrainz.includes.RecordingIncludesWs2;
 import org.musicbrainz.includes.ReleaseGroupIncludesWs2;
 import org.musicbrainz.includes.ReleaseIncludesWs2;
 import org.musicbrainz.includes.WorkIncludesWs2;
-import org.musicbrainz.model.entity.DiscWs2;
 import org.musicbrainz.model.PuidWs2;
 import org.musicbrainz.model.entity.ArtistWs2;
 import org.musicbrainz.model.entity.CollectionWs2;
+import org.musicbrainz.model.entity.DiscWs2;
 import org.musicbrainz.model.entity.EntityWs2;
 import org.musicbrainz.model.entity.LabelWs2;
 import org.musicbrainz.model.entity.RecordingWs2;
@@ -30,6 +22,11 @@ import org.musicbrainz.model.entity.ReleaseWs2;
 import org.musicbrainz.model.entity.WorkWs2;
 import org.musicbrainz.model.entity.listelement.ReleaseListWs2;
 import org.musicbrainz.query.QueryWs2;
+import org.musicbrainz.utils.MbUtils;
+import org.musicbrainz.webservice.RequestException;
+import org.musicbrainz.webservice.ResponseException;
+import org.musicbrainz.webservice.WebService;
+import org.musicbrainz.wsxml.element.Metadata;
 
 /*  Implements Lookup query in WS2.
 
@@ -70,7 +67,7 @@ public class LookUpWs2 extends QueryWs2 {
 
         } catch (org.musicbrainz.MBWS2Exception ex) {
 
-                log.error("Webservice returned: "+HttpStatus.SC_SERVICE_UNAVAILABLE+" message: " + ex.getMessage());
+                log.error("Webservice returned: 503 message: " + ex.getMessage());
                 throw ex;
         }
 
