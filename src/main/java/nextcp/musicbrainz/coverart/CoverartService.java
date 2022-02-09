@@ -45,7 +45,7 @@ public class CoverartService
             Response response = call.execute();
             if (response.code() == 404)
             {
-                log.info("no coverart found four relaseId : " + releaseId);
+                log.info("no coverart found for relaseId : " + releaseId);
                 return "";
             }
             

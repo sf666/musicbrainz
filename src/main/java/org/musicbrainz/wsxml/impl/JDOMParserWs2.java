@@ -747,7 +747,7 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
                   //ignore.
               }  
               else{
-                  log.warn("Unrecognised Work attribute: "+attribute.getName());
+                  log.debug("Unrecognised Work attribute: "+attribute.getName());
               }
         }
 
@@ -788,7 +788,7 @@ public class JDOMParserWs2 extends DomainsWs2 implements MbXmlParser  {
             }
             else
             {
-                log.warn("Unrecognised Work element: "+child.getName());
+                log.debug("Unrecognised Work element: "+child.getName());
             }
         }
         return work;
