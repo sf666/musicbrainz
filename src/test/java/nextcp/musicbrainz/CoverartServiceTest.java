@@ -16,13 +16,23 @@ import nextcp.musicbrainz.coverart.CoverartService;
 @ComponentScan(
 { "nextcp" })
 /**
- * How to use coverart service.
+ * How to use coverart service. Inject the services or create them ... 
  */
 public class CoverartServiceTest
 {
     @Lazy
     @Autowired
     private CoverartService service = null;
+    
+    
+    public CoverartServiceTest()
+    {
+        if (service == null)
+        {
+            // Spring not available ... 
+            service = new CoverartService();
+        }
+    }
     
     @Test
     public void testCoverart()

@@ -16,4 +16,5 @@ All the configurations were put in the application.yml file. Setup is based on t
 
 ## How to use
 
-Look at test cases how to use. 
+- Look at test cases how to use. You need a dependency 
+- If you don't use Spring depencency injection, provide required services on constructor call or by calling the appropriate setter

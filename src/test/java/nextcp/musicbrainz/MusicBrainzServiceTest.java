@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ContextConfiguration;
 
+import nextcp.musicbrainz.coverart.CoverartService;
 
 @SpringBootTest
 @Configuration
@@ -22,22 +21,29 @@ import org.springframework.test.context.ContextConfiguration;
 @ComponentScan(
 { "nextcp" })
 /**
- * This test case demonstrates how to use the service.
+ * This test case demonstrates how to use the service. Inject the services or create them (see constructor) ...
  */
 public class MusicBrainzServiceTest implements AlbumLookupCallback
 {
     @Lazy
     @Autowired
     private MusicBrainzService service = null;
-    
+
     @Lazy
     @Autowired
-    private BatchLookupService batchService = null;        
+    private BatchLookupService batchService = null;
 
     public MusicBrainzServiceTest()
     {
+        // If not using spring, create services manually
+        if (service == null)
+        {
+            service = new MusicBrainzService();
+            CoverartService cs = new CoverartService();
+            batchService = new BatchLookupService(cs, service);
+        }
     }
-    
+
     @Test
     public void testMusicBrainzRelease()
     {
@@ -46,23 +52,23 @@ public class MusicBrainzServiceTest implements AlbumLookupCallback
         assertEquals("Not Your Barbie Girl", dto.albumTitle);
         assertEquals("2018-08-13", dto.albumYear);
     }
-    
+
     @Test
     public void testMusicBatchLookup() throws InterruptedException, ExecutionException
     {
         batchService.addCallbackListener(this);
         batchService.queueLookup("1e0eee38-a9f6-49bf-84d0-45d0647799af");
         batchService.queueLookup("ecc28175-395b-4b40-b605-6ee6dc8d2d47");
-        
+
         // give some time to lookup and call the releaseDiscovered() method
         Thread.sleep(4000);
     }
-    
+
     @Bean
     public MusicBrainzConfig getConfig()
     {
         MusicBrainzConfig config = new MusicBrainzConfig();
-        
+
         return config;
     }
 
