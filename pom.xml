@@ -6,7 +6,7 @@
 
 	<groupId>de.sf666</groupId>
 	<artifactId>musicbrainz</artifactId>
-	<version>1.2</version>
+	<version>1.3-SNAPSHOT</version>
 	<name>musicbrainz</name>
 	<description>Musicbrainz library</description>
 
