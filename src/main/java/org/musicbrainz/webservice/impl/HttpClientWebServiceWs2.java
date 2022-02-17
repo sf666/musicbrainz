@@ -6,43 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.net.ssl.SSLHandshakeException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParamBean;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
-import org.musicbrainz.webservice.AuthorizationException;
 import org.musicbrainz.webservice.DefaultWebServiceWs2;
-import org.musicbrainz.webservice.RequestException;
-import org.musicbrainz.webservice.ResourceNotFoundException;
 import org.musicbrainz.webservice.WebServiceException;
 import org.musicbrainz.wsxml.MbXMLException;
 import org.musicbrainz.wsxml.element.Metadata;
@@ -52,6 +21,7 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -69,11 +39,6 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
     private Log log = LogFactory.getLog(HttpClientWebServiceWs2.class);
 
     /**
-     * A {@link HttpClient} instance
-     */
-    private DefaultHttpClient httpClient;
-
-    /**
      * 
      */
     private OkHttpClient okClient = null;
@@ -83,19 +48,6 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
      */
     public HttpClientWebServiceWs2()
     {
-        this.httpClient = new DefaultHttpClient();
-        initOkClient();
-    }
-
-    /**
-     * Use this constructor to inject a configured {@link DefaultHttpClient}.
-     * 
-     * @param httpClient
-     *            A configured {@link DefaultHttpClient}.
-     */
-    public HttpClientWebServiceWs2(DefaultHttpClient httpClient)
-    {
-        this.httpClient = httpClient;
         initOkClient();
     }
 
@@ -120,7 +72,7 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
             {
                 return c;
             }
-        }).build();
+        }).connectTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
     }
 
     @Override
@@ -137,28 +89,6 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
         {
             log.warn("login failed to musicbrainz.org", e);
         }
-    }
-
-    private void setConnectionParam()
-    {
-
-        HttpParams connectionParams = httpClient.getParams();
-
-        HttpConnectionParams.setConnectionTimeout(connectionParams, 10000);
-        HttpConnectionParams.setSoTimeout(connectionParams, 10000);
-        connectionParams.setParameter("http.useragent", USERAGENT);
-        connectionParams.setParameter("http.protocol.content-charset", "UTF-8");
-
-        if (getUsername() != null && !getUsername().isEmpty())
-        {
-
-            UsernamePasswordCredentials creds = new UsernamePasswordCredentials(getUsername(), getPassword());
-
-            AuthScope authScope = new AuthScope(getHost(), AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME);
-
-            httpClient.getCredentialsProvider().setCredentials(authScope, creds);
-        }
-
     }
 
     /**
@@ -189,52 +119,9 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
         return null;
     }
 
-    private void setRetryHandler()
-    {
-
-        // retry 3 times, do not retry if we got a response, because we
-        // may only query the web service once a second
-
-        HttpRequestRetryHandler myRetryHandler = new HttpRequestRetryHandler()
-        {
-
-            public boolean retryRequest(IOException exception, int executionCount, HttpContext context)
-            {
-
-                if (executionCount >= 3)
-                {
-                    // Do not retry if over max retry count
-                    return false;
-                }
-                if (exception instanceof NoHttpResponseException)
-                {
-                    // Retry if the server dropped connection on us
-                    return true;
-                }
-                if (exception instanceof SSLHandshakeException)
-                {
-                    // Do not retry on SSL handshake exception
-                    return false;
-                }
-                HttpRequest request = (HttpRequest) context.getAttribute(ExecutionContext.HTTP_REQUEST);
-                boolean idempotent = !(request instanceof HttpEntityEnclosingRequest);
-                if (idempotent)
-                {
-                    // Retry if the request is considered idempotent
-                    return true;
-                }
-                return false;
-            }
-        };
-
-        httpClient.setHttpRequestRetryHandler(myRetryHandler);
-    }
-
     @Override
     protected Metadata doGet(String url) throws WebServiceException, MbXMLException
     {
-        setConnectionParam();
-        setRetryHandler();// inside the call
 
         // retry with new calls if the error is 503 Service unavaillable.
         boolean repeat = true;
@@ -251,11 +138,13 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
             {
                 url += "&fmt=xml";
             }
-            HttpGet method = new HttpGet(url);
-            method.setHeader(HttpHeaders.ACCEPT, "application/xml");
-            method.setHeader(HttpHeaders.CACHE_CONTROL, "max-age=0");
+            System.out.println("Hitting url: " + url);
 
-            Metadata md = executeMethod(method);
+            Request request = new Request.Builder().url(url).header("User-Agent", "musicbrainz-lib-java/1.2 ( https://github.com/sf666/musicbrainz )")
+                    .addHeader("Accept", "application/xml").get().build();
+            Call call = okClient.newCall(request);
+            Metadata md = executeMethod(call);
+
             if (md == null && trial > maxtrial)
             {
                 String em = "ABORTED: web service returned an error " + maxtrial + " time consecutively";
@@ -279,90 +168,63 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
     @Override
     protected Metadata doPost(String url, Metadata md) throws WebServiceException, MbXMLException
     {
+        String postBody = getWriter().getXmlString(md);
+        RequestBody body = RequestBody.create(postBody, MediaType.parse("application/xml; charset=UTF-8"));
+        Request request = new Request.Builder().url(url).header("User-Agent", "musicbrainz-lib-java/1.2 ( https://github.com/sf666/musicbrainz )")
+                .addHeader("Accept", "application/xml").post(body).build();
+        Call call = okClient.newCall(request);
 
-        setConnectionParam();
-        setRetryHandler();// inside the call
-
-        HttpPost method = new HttpPost(url);
-        method.setHeader(HttpHeaders.ACCEPT, "application/xml");
-
-        try
-        {
-
-            StringEntity httpentity = new StringEntity(getWriter().getXmlString(md));
-            httpentity.setContentType(new BasicHeader("Content-Type", "application/xml; charset=UTF-8"));
-
-            method.setEntity(httpentity);
-            return executeMethod(method);
-
-        }
-        catch (IOException ex)
-        {
-            Logger.getLogger(HttpClientWebServiceWs2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return executeMethod(call);
     }
 
     @Override
     protected Metadata doPut(String url) throws WebServiceException, MbXMLException
     {
-        setConnectionParam();
-
-        HttpPut method = new HttpPut(url);
-        return executeMethod(method);
-
+        String postBody = "";
+        RequestBody body = RequestBody.create(postBody, MediaType.parse("application/xml; charset=UTF-8"));
+        Request request = new Request.Builder().url(url).header("User-Agent", "musicbrainz-lib-java/1.2 ( https://github.com/sf666/musicbrainz )")
+                .addHeader("Accept", "application/xml").put(body).build();
+        Call call = okClient.newCall(request);
+        return executeMethod(call);
     }
 
     @Override
     protected Metadata doDelete(String url) throws WebServiceException, MbXMLException
     {
-
-        setConnectionParam();
-        HttpDelete method = new HttpDelete(url);
-        return executeMethod(method);
+        String postBody = "";
+        RequestBody body = RequestBody.create(postBody, MediaType.parse("application/xml; charset=UTF-8"));
+        Request request = new Request.Builder().url(url).header("User-Agent", "musicbrainz-lib-java/1.2 ( https://github.com/sf666/musicbrainz )")
+                .addHeader("Accept", "application/xml").delete(body).build();
+        Call call = okClient.newCall(request);
+        return executeMethod(call);
     }
 
-    private Metadata executeMethod(HttpUriRequest method) throws MbXMLException, WebServiceException
+    private Metadata executeMethod(Call call) throws MbXMLException, WebServiceException
     {
-
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParamBean paramsBean = new HttpProtocolParamBean(params);
-        paramsBean.setUserAgent(USERAGENT);
-        method.setParams(params);
-
         try
         {
             // Execute the method.
-            System.out.println("Hitting url: " + method.getURI().toString());
-            HttpResponse response = this.httpClient.execute(method);
-
+            Response response = call.execute();
             lastHitTime = System.currentTimeMillis();
-
-            int statusCode = response.getStatusLine().getStatusCode();
-
+            int statusCode = response.code();
             switch (statusCode)
             {
-                case HttpStatus.SC_SERVICE_UNAVAILABLE:
+                case 503:
                 {
-                    // Maybe the server is too busy, let's try again.
-                    log.warn(buildMessage(response, "Service unavaillable"));
-                    method.abort();
                     lastHitTime = System.currentTimeMillis();
                     wait(1);
                     return null;
                 }
-                case HttpStatus.SC_BAD_GATEWAY:
+                case 502: // HttpStatus.SC_BAD_GATEWAY:
                 {
                     // Maybe the server is too busy, let's try again.
-                    log.warn(buildMessage(response, "Bad Gateway"));
-                    method.abort();
                     lastHitTime = System.currentTimeMillis();
                     wait(1);
                     return null;
                 }
-                case HttpStatus.SC_OK:
+                case 200:
                     boolean debug_response = false;
-                    try (InputStream instream = response.getEntity().getContent())
+                    try (InputStream instream = response.body().byteStream())
                     {
                         Metadata mtd = null;
                         if (debug_response)
@@ -377,30 +239,10 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
                         lastHitTime = System.currentTimeMillis();
                         return mtd;
                     }
-
-                case HttpStatus.SC_NOT_FOUND:
-                    throw new ResourceNotFoundException(buildMessage(response, "Not found"));
-
-                case HttpStatus.SC_BAD_REQUEST:
-                    throw new RequestException(buildMessage(response, "Bad Request"));
-
-                case HttpStatus.SC_FORBIDDEN:
-                    throw new AuthorizationException(buildMessage(response, "Forbidden"));
-
-                case HttpStatus.SC_UNAUTHORIZED:
-                    throw new AuthorizationException(buildMessage(response, "Unauthorized"));
-
-                // This is the actual response code for invalid username o password
-                case HttpStatus.SC_INTERNAL_SERVER_ERROR:
-                {
-                    throw new AuthorizationException(buildMessage(response, "Internal server error"));
-                }
                 default:
                 {
-
-                    String em = buildMessage(response, "");
-                    log.error("Fatal web service error: " + em);
-                    throw new WebServiceException(em);
+                    log.error("Fatal web service error: " + statusCode);
+                    throw new WebServiceException(statusCode + " " + response.message());
                 }
 
             }
@@ -410,53 +252,6 @@ public class HttpClientWebServiceWs2 extends DefaultWebServiceWs2
             log.error("Fatal transport error: " + e.getMessage());
             throw new WebServiceException(e.getMessage(), e);
         }
-    }
-
-    private String buildMessage(HttpResponse response, String status)
-    {
-        String msg = "";
-        InputStream instream;
-        int statusCode = response.getStatusLine().getStatusCode();
-        String reasonPhrase = response.getStatusLine().getReasonPhrase();
-
-        if (reasonPhrase == null || reasonPhrase.isEmpty())
-            reasonPhrase = status;
-
-        msg = "Server response was: " + statusCode + " " + reasonPhrase;
-
-        try
-        {
-            instream = response.getEntity().getContent();
-            Metadata mtd;
-            try
-            {
-                mtd = getParser().parse(instream);
-                msg = msg + " MESSAGE: " + mtd.getMessage();
-                instream.close();
-            }
-            catch (MbXMLException ex)
-            {
-                Logger.getLogger(HttpClientWebServiceWs2.class.getName()).log(Level.SEVERE, convertInputStreamToString(instream), ex);
-            }
-        }
-        catch (IOException ignore)
-        {
-        }
-        catch (IllegalStateException ignore)
-        {
-        }
-
-        finally
-        {
-            try
-            {
-                EntityUtils.consume(response.getEntity());
-            }
-            catch (IOException ex)
-            {
-            }
-        }
-        return msg;
     }
 
     private static long lastHitTime = 0;
