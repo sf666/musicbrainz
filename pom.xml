@@ -15,8 +15,7 @@
 
 	<properties>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-     		<maven.compiler.source>17</maven.compiler.source>
-     		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 
 	<build>
@@ -25,6 +24,14 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.14.0</version>
+				<configuration>
+					<release>${maven.compiler.release}</release>
+				</configuration>
+			</plugin>			
 		</plugins>
 	</build>
 
