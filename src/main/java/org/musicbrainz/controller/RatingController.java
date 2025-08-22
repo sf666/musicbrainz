@@ -3,12 +3,8 @@ package org.musicbrainz.controller;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.musicbrainz.MBWS2Exception;
-import org.musicbrainz.model.RatingsWs2;
-import org.musicbrainz.query.submission.UserRatingSubmissionWs2;
 import org.musicbrainz.webservice.WebService;
 import org.musicbrainz.webservice.WebServiceException;
-import org.musicbrainz.wsxml.element.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
