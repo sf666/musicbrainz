@@ -6,20 +6,22 @@ package org.musicbrainz.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.musicbrainz.MBWS2Exception;
 import org.musicbrainz.filter.browsefilter.ReleaseBrowseFilterWs2;
 import org.musicbrainz.filter.searchfilter.RecordingSearchFilterWs2;
 import org.musicbrainz.includes.RecordingIncludesWs2;
 import org.musicbrainz.includes.ReleaseIncludesWs2;
+import org.musicbrainz.model.RatingsWs2;
 import org.musicbrainz.model.entity.RecordingWs2;
 import org.musicbrainz.model.entity.ReleaseWs2;
 import org.musicbrainz.model.searchresult.RecordingResultWs2;
 import org.musicbrainz.query.browse.ReleaseBrowseWs2;
 import org.musicbrainz.query.lookUp.LookUpWs2;
 import org.musicbrainz.query.search.RecordingSearchWs2;
+import org.musicbrainz.query.submission.UserRatingSubmissionWs2;
+import org.musicbrainz.webservice.WebService;
+import org.musicbrainz.webservice.impl.HttpClientWebServiceWs2;
+import org.musicbrainz.wsxml.element.Metadata;
 
 public class Recording extends Controller
 {
@@ -28,11 +30,22 @@ public class Recording extends Controller
     private ReleaseBrowseWs2 releaseBrowse;
     private ReleaseIncludesWs2 releaseIncludes;
     private ReleaseBrowseFilterWs2 releaseBrowseFilter;
+    
+	private WebService rateWs = null;
+    
 
     public Recording()
     {
         super();
         setIncluded(new RecordingIncludesWs2());
+    }
+
+    public Recording(String user, String pass, String clientName)
+    {
+        super();
+        setIncluded(new RecordingIncludesWs2());
+		rateWs = new HttpClientWebServiceWs2(user, pass, clientName);
+		setClient(clientName);
     }
     // -------------- Search -------------------------------------------------//
 
@@ -215,7 +228,11 @@ public class Recording extends Controller
 
         if (needsLookUp(inc))
         {
-            setLookUp(new LookUpWs2(getQueryWs()));
+        	if (rateWs != null) {
+                setLookUp(new LookUpWs2(rateWs));
+        	} else {
+                setLookUp(new LookUpWs2(getQueryWs()));
+        	}
 
             RecordingWs2 transit = null;
             transit = getLookUp().getRecordingById(id, inc);
@@ -434,4 +451,29 @@ public class Recording extends Controller
         this.releaseBrowseFilter = releaseBrowseFilter;
     }
 
+    public void setClient(String client) {
+    	rateWs.setClient(client);
+    	getQueryWs().setClient(client);
+    }
+    
+    public final void rate(float rating, String user, String pass) throws MBWS2Exception {
+
+		RatingsWs2 r = new RatingsWs2();
+		r.setAverageRating(rating);
+		getEntity().setUserRating(r);
+		postUserRatings(user, pass);
+	}
+
+	public final void postUserRatings(String user, String pass) throws MBWS2Exception {
+
+		UserRatingSubmissionWs2 query = new UserRatingSubmissionWs2(rateWs);
+
+		query.addEntity(getEntity());
+		Metadata md = query.submit();
+		// You could also test the metadata.message if is OK or throw an
+		// exception
+		getIncluded().setRatings(false);
+		getIncluded().setUserRatings(false);
+		// in order to refresh the data at next Lookup.
+	}    
 }

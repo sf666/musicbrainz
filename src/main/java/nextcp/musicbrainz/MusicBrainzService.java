@@ -1,7 +1,6 @@
 package nextcp.musicbrainz;
 
 import java.util.HashMap;
-
 import org.apache.commons.lang3.StringUtils;
 import org.musicbrainz.MBWS2Exception;
 import org.musicbrainz.controller.RatingController;
@@ -79,18 +78,14 @@ public class MusicBrainzService
     {
         if (stars < 0 || stars > 5)
         {
-            throw new RuntimeException("star rating out of bounds. Allowed is 0-5. Given :" + stars);
+            throw new RuntimeException("star rating out of bounds. Allowed is 0-5. Given : " + stars);
         }
 
-        Recording controller = new Recording();
-        controller.getQueryWs().setUsername(config.username);
-        controller.getQueryWs().setPassword(config.password);
-        controller.getQueryWs().setClient("nextcp2");
+        Recording controller = new Recording(config.username, config.password, "nextcp2");
         controller.getIncludes().setUserRatings(true);
         controller.getIncludes().setUserTags(true);
-
         controller.lookUp(trackId);
-        controller.rate(stars);
+        controller.rate(stars, config.username, config.password);
     }
 
     public HashMap<String, Integer> getAllUserRatings()

@@ -24,447 +24,475 @@ import org.musicbrainz.query.submission.UserRatingSubmissionWs2;
 import org.musicbrainz.query.submission.UserTagSubmissionWs2;
 import org.musicbrainz.wsxml.element.Metadata;
 
+public abstract class Controller extends DomainsWs2 {
 
-public abstract class Controller extends DomainsWs2{
-    
-    
-    private WebService readRating;
-    private WebService queryWs;
-    private WebService annotationWs;
-    private int browseLimit = 100;
-    
-    private SearchFilterWs2 searchFilter;
-    private SearchWs2 search;
-    
-    private IncludesWs2 includes;
-    private IncludesWs2 Included;
-    private LookUpWs2 lookUp;
-    private EntityWs2 entity;
-    
-    private EntityWs2 incoming;
-    
-    public Controller(){
-    
-    }
-     
-    // -------------- Search  -------------------------------------------------//
-    
-    // To be Overridden
-    protected void search(String searchText){}
-    
-    protected void initSearch(String searchText){
-    
-        setQueryWs(getQueryWs());
-        setSearchFilter(getSearchFilter());
-        
-        if (getSearchFilter()== null) return;
-        getSearchFilter().setQuery(searchText);
-    }
-    //To be Overridden
-    protected SearchFilterWs2 getDefaultSearchFilter(){
-        return null;
-    }
-    /**
-     * @return the filter
-     */
-    protected SearchFilterWs2 getSearchFilter() {
-        if (searchFilter == null)
-            searchFilter = getDefaultSearchFilter();
-        return searchFilter;
-    }
-    /**
-     * @param filter the filter to set
-     */
-    protected void setSearchFilter(SearchFilterWs2 filter) {
-        this.searchFilter = filter;
-    }
-    
-    public boolean hasMore(){
-        
-        if (getSearch() == null) return true;
-        return getSearch().hasMore();
-    }
-    /**
-     * @return the search
-     */
-    protected SearchWs2 getSearch() {
-        return search;
-    }
-    /**
-     * @param search the search to set
-     */
-    protected void setSearch(SearchWs2 search) {
-        this.search = search;
-    }
-    // -------------- LookUp  -------------------------------------------------//
-    
-    //To be Overridden
-    protected IncludesWs2 getDefaultIncludes(){
-        return null;
-    }
-    /**
-     * @return the includes
-     */
-    public IncludesWs2 getIncludes() {
-        if (includes == null)
-            includes = getDefaultIncludes();
-        return includes;
-    }
-    /**
-     * @param includes the includes to set
-     */
-    public void setIncludes(IncludesWs2 includes) {
-        this.includes = includes;
-    }
-    
-    /**
-     * @return the lookUp
-   */
-    protected LookUpWs2 getLookUp() {
-        return lookUp;
-    }
+	private WebService readRating;
+	private WebService queryWs;
+	private WebService rateWs;
+	private WebService annotationWs;
+	private int browseLimit = 100;
 
-    /**
-     * @param lookUp the lookUp to set
-     */
-    protected void setLookUp(LookUpWs2 lookUp) {
-        this.lookUp = lookUp;
-    }
+	private SearchFilterWs2 searchFilter;
+	private SearchWs2 search;
 
-    
-    /**
-     * @return the Included
-     */
-    protected IncludesWs2 getIncluded() {
-        return Included;
-    }
+	private IncludesWs2 includes;
+	private IncludesWs2 Included;
+	private LookUpWs2 lookUp;
+	private EntityWs2 entity;
 
-    /**
-     * @param Included the Included to set
-     */
-    protected void setIncluded(IncludesWs2 Included) {
-        this.Included = Included;
-    }
+	private EntityWs2 incoming;
 
-    protected IncludesWs2 getIncrementalInc(IncludesWs2 inc){
-        
-        if (getIncludes().isArtistRelations() && !getIncluded().isArtistRelations()) inc.setArtistRelations(true);
-        if (getIncludes().isLabelRelations() && !getIncluded().isLabelRelations()) inc.setLabelRelations(true);
-        if (getIncludes().isReleaseRelations() && !getIncluded().isReleaseRelations()) inc.setReleaseRelations(true);
-        if (getIncludes().isReleaseGroupRelations() && !getIncluded().isReleaseGroupRelations()) inc.setReleaseGroupRelations(true);
-        if (getIncludes().isRecordingRelations() && !getIncluded().isRecordingRelations()) inc.setRecordingRelations(true);
-        if (getIncludes().isWorkRelations() && !getIncluded().isWorkRelations()) inc.setWorkRelations(true);
-        if (getIncludes().isUrlRelations() && !getIncluded().isUrlRelations()) inc.setUrlRelations(true);
-        
-        if (getIncludes().isRecordingLevelRelations() && !getIncluded().isRecordingLevelRelations()) inc.setRecordingLevelRelations(true);
-        if (getIncludes().isWorkLevelRelations() && !getIncluded().isWorkLevelRelations()) inc.setWorkLevelRelations(true);
-        
-        if (getIncludes().isArtistCredits() && !getIncluded().isArtistCredits()) inc.setArtistCredits(true);
-        if (getIncludes().isAnnotation() && !getIncluded().isAnnotation()) inc.setAnnotation(true);
-        if (getIncludes().isTags() && !getIncluded().isTags()) inc.setTags(true);
-        if (getIncludes().isRatings() && !getIncluded().isRatings()) inc.setRatings(true);
-        if (getIncludes().isUserTags() && !getIncluded().isUserTags()) inc.setUserTags(true);
-        if (getIncludes().isUserRatings() && !getIncluded().isUserRatings()) inc.setUserRatings(true);
-        
-        return inc;
-    }
-    
-    protected boolean needsLookUp(IncludesWs2 inc){
-        
-        return ( inc.isArtistRelations()||
-                    inc.isLabelRelations()||
-                    inc.isReleaseRelations()||
-                    inc.isReleaseGroupRelations()||
-                    inc.isRecordingRelations()||
-                    inc.isWorkRelations()||
-                    inc.isUrlRelations()||
-                    inc.isTags()||
-                    inc.isRatings()||
-                    inc.isUserTags()||
-                    inc.isUserRatings());
-    }
-    protected void updateEntity(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) throws MBWS2Exception{
-    
-        updateTags(entity,transit,inc);
-        updateRatings(entity,transit,inc);
-        updateUserTags(entity,transit,inc);
-        updateUserRatings(entity,transit,inc);
-        updateRelations(entity,transit,inc);
-        
-    }
-    
-    private void updateTags(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc){
-        
-        if (!inc.isTags()) return;
+	public Controller() {
 
-        entity.setTags(transit.getTags());
-        getIncluded().setTags(true);
-    }
-     private void updateUserTags(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc){
-        
-        if (!inc.isUserTags()) return;
+	}
 
-        entity.setUserTags(transit.getUserTags());
-        getIncluded().setUserTags(true);
-    }
-    private void updateRatings(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc){
-        
-        if (!inc.isRatings()) return;
-        
-        entity.setRating(transit.getRating());
-        getIncluded().setRatings(true);
-    }
-    private void updateUserRatings(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc){
-        
-        if (!inc.isRatings()) return;
-        
-        entity.setUserRating(transit.getUserRating());
-        getIncluded().setUserRatings(true);
-    }
-    private void updateRelations (EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) throws MBWS2Exception{
-            
-        for (RelationWs2 rel : transit.getRelationList().getRelations())
-        {
-            entity.getRelationList().addRelation(rel);
+	// -------------- Search -------------------------------------------------//
 
-            /* MB don't accept Artist Credits requests for works 
-          * at the moment,so we have to complete the relations.
-          * 
-          * Time consuming, but no other way. To avoid it, set 
-          * getIncludes().setArtistCredits(false) when asking for
-          * relations involving a Work.
-          */
-            
-            if (!getIncludes().isArtistCredits()) continue;
+	// To be Overridden
+	protected void search(String searchText) {
+	}
 
-            if (inc.isWorkRelations() &&
-                          rel.getTargetType().equals(RelationWs2.TO_WORK)){
+	protected void initSearch(String searchText) {
 
-                WorkWs2 wkWs2 = (WorkWs2)rel.getTarget();
+		setQueryWs(getQueryWs());
+		setSearchFilter(getSearchFilter());
 
-                if (wkWs2.getArtistCredit() != null ||
-                    !wkWs2.getWritersString().isEmpty()) continue;
+		if (getSearchFilter() == null)
+			return;
+		getSearchFilter().setQuery(searchText);
+	}
 
-                Work work = new Work();
-                work.setQueryWs(getQueryWs());
-                
-                work.getIncludes().excludeAll();
-                work.getIncludes().setArtistRelations(true);
-                work.getIncludes().setArtistCredits(true);
-                
-                wkWs2 = work.lookUp(wkWs2);
+	// To be Overridden
+	protected SearchFilterWs2 getDefaultSearchFilter() {
+		return null;
+	}
 
-                rel.setTarget(wkWs2);
-            }
-            else if (getEntity()instanceof WorkWs2 &&
-                        inc.isRecordingRelations() &&
-                        rel.getTargetType().equals(RelationWs2.TO_RECORDING)) {
-            
-                RecordingWs2 recWs2 = (RecordingWs2)rel.getTarget();
+	/**
+	 * @return the filter
+	 */
+	protected SearchFilterWs2 getSearchFilter() {
+		if (searchFilter == null)
+			searchFilter = getDefaultSearchFilter();
+		return searchFilter;
+	}
 
-                if (recWs2.getArtistCredit() != null) continue;
+	/**
+	 * @param filter the filter to set
+	 */
+	protected void setSearchFilter(SearchFilterWs2 filter) {
+		this.searchFilter = filter;
+	}
 
-                Recording rec = new Recording();
-                rec.setQueryWs(getQueryWs());
+	public boolean hasMore() {
 
-                rec.getIncludes().excludeAll();
-                rec.getIncludes().setArtistCredits(true);
+		if (getSearch() == null)
+			return true;
+		return getSearch().hasMore();
+	}
 
-                recWs2 = rec.lookUp(recWs2);
-                rel.setTarget(recWs2);
-            }
-            else if (getEntity()instanceof WorkWs2 &&
-                        inc.isReleaseRelations() &&
-                        rel.getTargetType().equals(RelationWs2.TO_RELEASE)){
-                
-                ReleaseWs2 relWs2 = (ReleaseWs2)rel.getTarget();
+	/**
+	 * @return the search
+	 */
+	protected SearchWs2 getSearch() {
+		return search;
+	}
 
-                if (relWs2.getArtistCredit() != null) continue;
+	/**
+	 * @param search the search to set
+	 */
+	protected void setSearch(SearchWs2 search) {
+		this.search = search;
+	}
+	// -------------- LookUp -------------------------------------------------//
 
-                Release rls = new Release();
-                
-                rls.setQueryWs(getQueryWs());
-                
-                rls.getIncludes().excludeAll();
-                rls.getIncludes().setArtistCredits(true);
-            
-            }
-            else if (getEntity()instanceof WorkWs2 &&
-                        inc.isReleaseGroupRelations() &&
-                        rel.getTargetType().equals(RelationWs2.TO_RELEASE_GROUP)){
-                
-                 ReleaseGroupWs2 relWs2 = (ReleaseGroupWs2)rel.getTarget();
+	// To be Overridden
+	protected IncludesWs2 getDefaultIncludes() {
+		return null;
+	}
 
-                if (relWs2.getArtistCredit() != null) continue;
+	/**
+	 * @return the includes
+	 */
+	public IncludesWs2 getIncludes() {
+		if (includes == null)
+			includes = getDefaultIncludes();
+		return includes;
+	}
 
-                ReleaseGroup rg = new ReleaseGroup();
-                
-                rg.setQueryWs(getQueryWs());
-                
-                rg.getIncludes().excludeAll();
-                rg.getIncludes().setArtistCredits(true);
-            }
-        }
-        updateIncludedRelations(inc);
-    }
-    private void updateIncludedRelations (IncludesWs2 inc)
-    {
-            if (inc.isArtistRelations()) getIncluded().setArtistRelations(true);   
-            if (inc.isLabelRelations()) getIncluded().setLabelRelations(true);
-            if (inc.isReleaseRelations()) getIncluded().setReleaseRelations(true);
-            if (inc.isReleaseGroupRelations()) getIncluded().setReleaseGroupRelations(true);
-            if (inc.isRecordingRelations()) getIncluded().setRecordingRelations(true);
-            if (inc.isWorkRelations()) getIncluded().setWorkRelations(true);
-            if (inc.isUrlRelations()) getIncluded().setUrlRelations(true);
-            
-            if (inc.isRecordingLevelRelations()) getIncluded().setRecordingLevelRelations(true);
-            if (inc.isWorkLevelRelations()) getIncluded().setWorkLevelRelations(true);
-    }
-   
-    protected void loadAnnotation(EntityWs2 entity){
-    
-            entity.getAnnotation(getAnnotationWs());
-            getIncluded().setAnnotation(true);
-    }
-    /**
-     * @return the entity
-     */
-    protected EntityWs2 getEntity() {
-        return entity;
-    }
+	/**
+	 * @param includes the includes to set
+	 */
+	public void setIncludes(IncludesWs2 includes) {
+		this.includes = includes;
+	}
 
-    /**
-     * @param entity the entity to set
-     */
-    protected void setEntity(EntityWs2 entity) {
-        this.entity = entity;
-    }
-    // ------------- Browse -------------------------------------------------//
-    
-    // ------------- Submission --------------------------------------------//
-       
-    public final void AddTags(String[] userTags) throws MBWS2Exception{
-        
-        for (String tag : userTags)
-        {
-            TagWs2 t = new TagWs2();
-            t.setName(tag);
-            entity.addUserTag(t);
-        }
-        postUserTags();
-    }
-    
-    public final void postUserTags() throws MBWS2Exception{
-         
-         UserTagSubmissionWs2 query = new UserTagSubmissionWs2(getQueryWs());
-         query.addEntity(entity);
-         Metadata md = query.submit();
-         // You could also test the metadata.message if is OK or throw an exception
-         getIncluded().setTags(false);
-         getIncluded().setUserTags(false);
-         // in order to refresh the data at next Lookup.
-         
-     }
-     public final void rate(float rating) throws MBWS2Exception{
+	/**
+	 * @return the lookUp
+	 */
+	protected LookUpWs2 getLookUp() {
+		return lookUp;
+	}
 
-        RatingsWs2 r = new RatingsWs2();
-        r.setAverageRating(rating);
-        entity.setUserRating(r);
-        postUserRatings();
-    }
-     public final void postUserRatings() throws MBWS2Exception{
-         
-         UserRatingSubmissionWs2 query = new UserRatingSubmissionWs2(getQueryWs());
-         query.addEntity(entity);
-         Metadata md = query.submit();
-         // You could also test the metadata.message if is OK or throw an exception
-         getIncluded().setRatings(false);
-         getIncluded().setUserRatings(false);
-         // in order to refresh the data at next Lookup.
-     }
+	/**
+	 * @param lookUp the lookUp to set
+	 */
+	protected void setLookUp(LookUpWs2 lookUp) {
+		this.lookUp = lookUp;
+	}
 
-    // ----------------------------------------------------------------//
-    
-    private WebService getDefaultQueryWs(){
-        
-        return new HttpClientWebServiceWs2();
-    }
-    private WebService getDefaultAnnotationWs(){
-        
-        WebService adws = new HttpClientWebServiceWs2();
+	/**
+	 * @return the Included
+	 */
+	protected IncludesWs2 getIncluded() {
+		return Included;
+	}
 
-        ((DefaultWebServiceWs2)adws).setHost(ANNOTATIONHOST);
-        
-        return adws;
-    }
-    
-    /**
-     * @return the queryWs
-     */
-    public WebService getReadRatingWs() {
-        
-        if (readRating == null)
-            readRating = getDefaultQueryWs();
-        return readRating;
-    }
+	/**
+	 * @param Included the Included to set
+	 */
+	protected void setIncluded(IncludesWs2 Included) {
+		this.Included = Included;
+	}
 
-    /**
-     * @return the queryWs
-     */
-    public WebService getQueryWs() {
-        
-        if (queryWs == null)
-            queryWs = getDefaultQueryWs();
-        return queryWs;
-    }
-    /**
-     * @param ws the queryWs to set
-     */
-    public void setQueryWs(WebService ws) {
-        this.queryWs = ws;
-    }
-    /**
-     * @param ws the annotationWs to set
-     */
-    public void setAnnotationWs(WebService ws) {
-        this.annotationWs = ws;
-    }
-        /**
-     * @return the annotationWs
-     */
-    public WebService getAnnotationWs() {
-        
-        if (annotationWs == null)
-            annotationWs = getDefaultAnnotationWs();
-        return annotationWs;
-    }
+	protected IncludesWs2 getIncrementalInc(IncludesWs2 inc) {
 
-    /**
-     * @return the browseLimit
-     */
-    protected int getBrowseLimit() {
-        return browseLimit;
-    }
+		if (getIncludes().isArtistRelations() && !getIncluded().isArtistRelations())
+			inc.setArtistRelations(true);
+		if (getIncludes().isLabelRelations() && !getIncluded().isLabelRelations())
+			inc.setLabelRelations(true);
+		if (getIncludes().isReleaseRelations() && !getIncluded().isReleaseRelations())
+			inc.setReleaseRelations(true);
+		if (getIncludes().isReleaseGroupRelations() && !getIncluded().isReleaseGroupRelations())
+			inc.setReleaseGroupRelations(true);
+		if (getIncludes().isRecordingRelations() && !getIncluded().isRecordingRelations())
+			inc.setRecordingRelations(true);
+		if (getIncludes().isWorkRelations() && !getIncluded().isWorkRelations())
+			inc.setWorkRelations(true);
+		if (getIncludes().isUrlRelations() && !getIncluded().isUrlRelations())
+			inc.setUrlRelations(true);
 
-    /**
-     * @param browseLimit the browseLimit to set
-     */
-    protected void setBrowseLimit(int browseLimit) {
-        this.browseLimit = browseLimit;
-    }
+		if (getIncludes().isRecordingLevelRelations() && !getIncluded().isRecordingLevelRelations())
+			inc.setRecordingLevelRelations(true);
+		if (getIncludes().isWorkLevelRelations() && !getIncluded().isWorkLevelRelations())
+			inc.setWorkLevelRelations(true);
 
-    
-    /**
-     * @return the incoming Entity if any.
-     */
-    public EntityWs2 getIncoming() {
-        return incoming;
-    }
+		if (getIncludes().isArtistCredits() && !getIncluded().isArtistCredits())
+			inc.setArtistCredits(true);
+		if (getIncludes().isAnnotation() && !getIncluded().isAnnotation())
+			inc.setAnnotation(true);
+		if (getIncludes().isTags() && !getIncluded().isTags())
+			inc.setTags(true);
+		if (getIncludes().isRatings() && !getIncluded().isRatings())
+			inc.setRatings(true);
+		if (getIncludes().isUserTags() && !getIncluded().isUserTags())
+			inc.setUserTags(true);
+		if (getIncludes().isUserRatings() && !getIncluded().isUserRatings())
+			inc.setUserRatings(true);
 
-    /**
-     * @param incoming the incoming Entity to set
-     */
-    public void setIncoming(EntityWs2 incoming) {
-        this.incoming = incoming;
-    }
+		return inc;
+	}
+
+	protected boolean needsLookUp(IncludesWs2 inc) {
+
+		return (inc.isArtistRelations() || inc.isLabelRelations() || inc.isReleaseRelations() || inc.isReleaseGroupRelations() ||
+			inc.isRecordingRelations() || inc.isWorkRelations() || inc.isUrlRelations() || inc.isTags() || inc.isRatings() ||
+			inc.isUserTags() || inc.isUserRatings());
+	}
+
+	protected void updateEntity(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) throws MBWS2Exception {
+
+		updateTags(entity, transit, inc);
+		updateRatings(entity, transit, inc);
+		updateUserTags(entity, transit, inc);
+		updateUserRatings(entity, transit, inc);
+		updateRelations(entity, transit, inc);
+
+	}
+
+	private void updateTags(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) {
+
+		if (!inc.isTags())
+			return;
+
+		entity.setTags(transit.getTags());
+		getIncluded().setTags(true);
+	}
+
+	private void updateUserTags(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) {
+
+		if (!inc.isUserTags())
+			return;
+
+		entity.setUserTags(transit.getUserTags());
+		getIncluded().setUserTags(true);
+	}
+
+	private void updateRatings(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) {
+
+		if (!inc.isRatings())
+			return;
+
+		entity.setRating(transit.getRating());
+		getIncluded().setRatings(true);
+	}
+
+	private void updateUserRatings(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) {
+
+		if (!inc.isRatings())
+			return;
+
+		entity.setUserRating(transit.getUserRating());
+		getIncluded().setUserRatings(true);
+	}
+
+	private void updateRelations(EntityWs2 entity, EntityWs2 transit, IncludesWs2 inc) throws MBWS2Exception {
+
+		for (RelationWs2 rel : transit.getRelationList().getRelations()) {
+			entity.getRelationList().addRelation(rel);
+
+			/*
+			 * MB don't accept Artist Credits requests for works at the
+			 * moment,so we have to complete the relations.
+			 * 
+			 * Time consuming, but no other way. To avoid it, set
+			 * getIncludes().setArtistCredits(false) when asking for relations
+			 * involving a Work.
+			 */
+
+			if (!getIncludes().isArtistCredits())
+				continue;
+
+			if (inc.isWorkRelations() && rel.getTargetType().equals(RelationWs2.TO_WORK)) {
+
+				WorkWs2 wkWs2 = (WorkWs2) rel.getTarget();
+
+				if (wkWs2.getArtistCredit() != null || !wkWs2.getWritersString().isEmpty())
+					continue;
+
+				Work work = new Work();
+				work.setQueryWs(getQueryWs());
+
+				work.getIncludes().excludeAll();
+				work.getIncludes().setArtistRelations(true);
+				work.getIncludes().setArtistCredits(true);
+
+				wkWs2 = work.lookUp(wkWs2);
+
+				rel.setTarget(wkWs2);
+			} else if (getEntity() instanceof WorkWs2 && inc.isRecordingRelations() &&
+				rel.getTargetType().equals(RelationWs2.TO_RECORDING)) {
+
+				RecordingWs2 recWs2 = (RecordingWs2) rel.getTarget();
+
+				if (recWs2.getArtistCredit() != null)
+					continue;
+
+				Recording rec = new Recording();
+				rec.setQueryWs(getQueryWs());
+
+				rec.getIncludes().excludeAll();
+				rec.getIncludes().setArtistCredits(true);
+
+				recWs2 = rec.lookUp(recWs2);
+				rel.setTarget(recWs2);
+			} else if (getEntity() instanceof WorkWs2 && inc.isReleaseRelations() && rel.getTargetType().equals(RelationWs2.TO_RELEASE)) {
+
+				ReleaseWs2 relWs2 = (ReleaseWs2) rel.getTarget();
+
+				if (relWs2.getArtistCredit() != null)
+					continue;
+
+				Release rls = new Release();
+
+				rls.setQueryWs(getQueryWs());
+
+				rls.getIncludes().excludeAll();
+				rls.getIncludes().setArtistCredits(true);
+
+			} else if (getEntity() instanceof WorkWs2 && inc.isReleaseGroupRelations() &&
+				rel.getTargetType().equals(RelationWs2.TO_RELEASE_GROUP)) {
+
+				ReleaseGroupWs2 relWs2 = (ReleaseGroupWs2) rel.getTarget();
+
+				if (relWs2.getArtistCredit() != null)
+					continue;
+
+				ReleaseGroup rg = new ReleaseGroup();
+
+				rg.setQueryWs(getQueryWs());
+
+				rg.getIncludes().excludeAll();
+				rg.getIncludes().setArtistCredits(true);
+			}
+		}
+		updateIncludedRelations(inc);
+	}
+
+	private void updateIncludedRelations(IncludesWs2 inc) {
+		if (inc.isArtistRelations())
+			getIncluded().setArtistRelations(true);
+		if (inc.isLabelRelations())
+			getIncluded().setLabelRelations(true);
+		if (inc.isReleaseRelations())
+			getIncluded().setReleaseRelations(true);
+		if (inc.isReleaseGroupRelations())
+			getIncluded().setReleaseGroupRelations(true);
+		if (inc.isRecordingRelations())
+			getIncluded().setRecordingRelations(true);
+		if (inc.isWorkRelations())
+			getIncluded().setWorkRelations(true);
+		if (inc.isUrlRelations())
+			getIncluded().setUrlRelations(true);
+
+		if (inc.isRecordingLevelRelations())
+			getIncluded().setRecordingLevelRelations(true);
+		if (inc.isWorkLevelRelations())
+			getIncluded().setWorkLevelRelations(true);
+	}
+
+	protected void loadAnnotation(EntityWs2 entity) {
+
+		entity.getAnnotation(getAnnotationWs());
+		getIncluded().setAnnotation(true);
+	}
+
+	/**
+	 * @return the entity
+	 */
+	protected EntityWs2 getEntity() {
+		return entity;
+	}
+
+	/**
+	 * @param entity the entity to set
+	 */
+	public void setEntity(EntityWs2 entity) {
+		this.entity = entity;
+	}
+	// ------------- Browse -------------------------------------------------//
+
+	// ------------- Submission --------------------------------------------//
+
+	public final void AddTags(String[] userTags) throws MBWS2Exception {
+
+		for (String tag : userTags) {
+			TagWs2 t = new TagWs2();
+			t.setName(tag);
+			entity.addUserTag(t);
+		}
+		postUserTags();
+	}
+
+	public final void postUserTags() throws MBWS2Exception {
+
+		UserTagSubmissionWs2 query = new UserTagSubmissionWs2(getQueryWs());
+		query.addEntity(entity);
+		Metadata md = query.submit();
+		// You could also test the metadata.message if is OK or throw an
+		// exception
+		getIncluded().setTags(false);
+		getIncluded().setUserTags(false);
+		// in order to refresh the data at next Lookup.
+
+	}
+
+	// ----------------------------------------------------------------//
+
+	private WebService getDefaultQueryWs() {
+
+		return new HttpClientWebServiceWs2();
+	}
+
+	private WebService getDefaultAnnotationWs() {
+
+		WebService adws = new HttpClientWebServiceWs2();
+
+		((DefaultWebServiceWs2) adws).setHost(ANNOTATIONHOST);
+
+		return adws;
+	}
+
+	/**
+	 * @return the queryWs
+	 */
+	public WebService getReadRatingWs() {
+
+		if (readRating == null)
+			readRating = getDefaultQueryWs();
+		return readRating;
+	}
+
+	/**
+	 * @param pass 
+	 * @param user 
+	 * @return the queryWs
+	 */
+	public WebService getQueryWs() {
+
+		if (queryWs == null) {
+			queryWs = getDefaultQueryWs();
+		}
+		return queryWs;
+	}
+
+	public synchronized WebService getRateWs(String user, String pass) {
+
+		if (rateWs == null) {
+			rateWs = new HttpClientWebServiceWs2();
+			rateWs.login(user, pass);
+		}
+		return rateWs;
+	}
+	
+	/**
+	 * @param ws the queryWs to set
+	 */
+	public void setQueryWs(WebService ws) {
+		this.queryWs = ws;
+	}
+
+	/**
+	 * @param ws the annotationWs to set
+	 */
+	public void setAnnotationWs(WebService ws) {
+		this.annotationWs = ws;
+	}
+
+	/**
+	 * @return the annotationWs
+	 */
+	public WebService getAnnotationWs() {
+
+		if (annotationWs == null)
+			annotationWs = getDefaultAnnotationWs();
+		return annotationWs;
+	}
+
+	/**
+	 * @return the browseLimit
+	 */
+	protected int getBrowseLimit() {
+		return browseLimit;
+	}
+
+	/**
+	 * @param browseLimit the browseLimit to set
+	 */
+	protected void setBrowseLimit(int browseLimit) {
+		this.browseLimit = browseLimit;
+	}
+
+	/**
+	 * @return the incoming Entity if any.
+	 */
+	public EntityWs2 getIncoming() {
+		return incoming;
+	}
+
+	/**
+	 * @param incoming the incoming Entity to set
+	 */
+	public void setIncoming(EntityWs2 incoming) {
+		this.incoming = incoming;
+	}
 }
