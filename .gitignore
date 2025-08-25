@@ -33,3 +33,4 @@ build/
 *.gz
 bin
 pom.xml.versionsBackup
+deploy.sh
