@@ -1,91 +1,88 @@
 package nextcp.musicbrainz.coverart;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.client.ContentResponse;
+import org.eclipse.jetty.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import okhttp3.Call;
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import jakarta.annotation.PreDestroy;
 
 @Service
 public class CoverartService
 {
     private static final Logger log = LoggerFactory.getLogger(CoverartService.class.getName());
-    private OkHttpClient okClient = null;
+    private HttpClient httpClient = null;
     private ObjectMapper om = new ObjectMapper();
-    
+
     public CoverartService()
     {
-        initOkClient();
+        initHttpClient();
     }
-    
+
     public String getCoverartUrl(String releaseId)
     {
         if (StringUtils.isAllBlank(releaseId))
         {
             throw new RuntimeException("releaseId shall not be empty");
         }
-        
+
         String url = String.format("http://coverartarchive.org/release/%s", releaseId);
         try
         {
-            Request request = new Request.Builder().url(url).get().build();
-            Call call = okClient.newCall(request);
-            Response response = call.execute();
-            if (response.code() == 404)
+            ContentResponse response = httpClient.GET(url);
+            if (response.getStatus() == 404)
             {
-                log.info("no coverart found for relaseId : " + releaseId);
+                log.info("no coverart found for releaseId : " + releaseId);
                 return "";
             }
-            
-            String body = response.body().string();
+
+            String body = response.getContentAsString();
             CoverArtImages images = om.readValue(body, CoverArtImages.class);
             if (images != null && images.getImages() != null && images.getImages().get(0) != null)
             {
                 return images.getImages().get(0).getImage();
             }
-            log.warn("no cover art url found for relase id : " + releaseId);
+            log.warn("no cover art url found for release id : " + releaseId);
             return "";
         }
         catch (Exception e)
         {
-            log.warn("unable to retrieve rating data from musicbrainz.org", e);
-        }        
+            log.warn("unable to retrieve cover art data from coverartarchive.org", e);
+        }
         return "";
     }
-    
-    private void initOkClient()
+
+    private void initHttpClient()
     {
-        okClient = new OkHttpClient.Builder().cookieJar(new CookieJar()
+        try
         {
-            private List<Cookie> c = new ArrayList<>();
+            httpClient = new HttpClient();
+            httpClient.setFollowRedirects(true);
+            httpClient.start();
+        }
+        catch (Exception e)
+        {
+            log.error("failed to start Jetty HttpClient", e);
+        }
+    }
 
-            @Override
-            public void saveFromResponse(HttpUrl url, List<Cookie> cookies)
+    @PreDestroy
+    public void shutdown()
+    {
+        if (httpClient != null && httpClient.isStarted())
+        {
+            try
             {
-                c = cookies;
-                for (Cookie cookie : cookies)
-                {
-                    System.out.println(cookie);
-                }
+                httpClient.stop();
             }
-
-            @Override
-            public List<Cookie> loadForRequest(HttpUrl url)
+            catch (Exception e)
             {
-                return c;
+                log.warn("error stopping Jetty HttpClient", e);
             }
-        }).build();
-    }    
+        }
+    }
 }

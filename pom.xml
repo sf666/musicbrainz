@@ -4,7 +4,7 @@
 
 	<groupId>de.sf666</groupId>
 	<artifactId>musicbrainz</artifactId>
-	<version>1.4</version>
+	<version>1.4.2</version>
 	<name>musicbrainz</name>
 	<description>Musicbrainz library</description>
 
@@ -94,18 +94,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp-urlconnection</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>io.github.rburgst</groupId>
-		    <artifactId>okhttp-digest</artifactId>
-		    <version>3.1.1</version>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-client</artifactId>
+			<version>12.0.22</version>
 		</dependency>
 		<dependency>
 		    <groupId>javax.annotation</groupId>
@@ -116,16 +107,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp</artifactId>
-				<version>4.9.2</version>
-			</dependency>
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp-urlconnection</artifactId>
-				<version>4.9.1</version>
-			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
